@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -206,6 +207,9 @@ export function Employees() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Add New Employee</DialogTitle>
+                  <DialogDescription>
+                    Fill in the employee information below to add them to the system.
+                  </DialogDescription>
                 </DialogHeader>
                 <EmployeeForm />
               </DialogContent>
@@ -282,6 +286,9 @@ export function Employees() {
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>Edit Employee</DialogTitle>
+                          <DialogDescription>
+                            Update the employee information below.
+                          </DialogDescription>
                         </DialogHeader>
                         <EmployeeForm />
                       </DialogContent>
