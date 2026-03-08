@@ -1,15 +1,1081 @@
-
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Web app</title>
-    </head>
-
-    <body>
-      <div id="root"></div>
-      <script type="module" src="/src/main.tsx"></script>
-    </body>
-  </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprobe HRIS</title>
   
+  <!-- Geist Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    body {
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Mock Data
+    const mockEmployees = [
+      {
+        id: "EMP-001",
+        fullName: "Christopher Clark",
+        email: "christopher.clark@sprobe.com",
+        department: "Engineering",
+        position: "Senior Software Engineer",
+        joinDate: "2024-01-15",
+        status: "Active",
+        probationStatus: "Completed",
+      },
+      {
+        id: "EMP-002",
+        fullName: "Patricia Anderson",
+        email: "patricia.anderson@sprobe.com",
+        department: "Marketing",
+        position: "Marketing Manager",
+        joinDate: "2024-03-01",
+        status: "Active",
+        probationStatus: "In Progress",
+      },
+      {
+        id: "EMP-003",
+        fullName: "Robert Jackson",
+        email: "robert.jackson@sprobe.com",
+        department: "Sales",
+        position: "Sales Representative",
+        joinDate: "2024-02-10",
+        status: "Active",
+        probationStatus: "Completed",
+      },
+      {
+        id: "EMP-004",
+        fullName: "Jennifer Martin",
+        email: "jennifer.martin@sprobe.com",
+        department: "HR",
+        position: "HR Specialist",
+        joinDate: "2025-11-05",
+        status: "Active",
+        probationStatus: "In Progress",
+      },
+      {
+        id: "EMP-005",
+        fullName: "John Eve",
+        email: "john.eve@sprobe.com",
+        department: "Finance",
+        position: "Financial Analyst",
+        joinDate: "2025-12-20",
+        status: "Active",
+        probationStatus: "In Progress",
+      },
+    ];
+
+    const probationEmployees = [
+      { fullName: "Jennifer Martin", email: "jennifer.martin@sprobe.com", status: "Just Started" },
+      { fullName: "John Eve", email: "john.eve@sprobe.com", status: "Just Started" },
+      { fullName: "Patricia Anderson", email: "patricia.anderson@sprobe.com", status: "2nd Month" },
+      { fullName: "Sarah Wilson", email: "sarah.wilson@sprobe.com", status: "3rd Month Evaluation" },
+      { fullName: "Michael Brown", email: "michael.brown@sprobe.com", status: "4th Month" },
+      { fullName: "Emily Davis", email: "emily.davis@sprobe.com", status: "5th Month" },
+      { fullName: "David Johnson", email: "david.johnson@sprobe.com", status: "End of Probation Evaluation" },
+    ];
+
+    // Icon Components
+    const Icon = ({ name, className = "", size = 24 }) => {
+      useEffect(() => {
+        lucide.createIcons();
+      }, []);
+      return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+    };
+
+    // UI Components
+    const Button = ({ children, onClick, className = "", variant = "default", size = "default", type = "button" }) => {
+      const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+      const variants = {
+        default: "bg-gray-900 text-white hover:bg-gray-800",
+        outline: "border border-gray-300 bg-white hover:bg-gray-50",
+        ghost: "hover:bg-gray-100",
+      };
+      const sizes = {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 px-3 text-sm",
+        lg: "h-11 px-8",
+      };
+      
+      return (
+        <button
+          type={type}
+          onClick={onClick}
+          className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+        >
+          {children}
+        </button>
+      );
+    };
+
+    const Input = ({ className = "", ...props }) => {
+      return (
+        <input
+          className={`flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+          {...props}
+        />
+      );
+    };
+
+    const Card = ({ children, className = "" }) => {
+      return (
+        <div className={`rounded-lg border border-gray-200 bg-white shadow-sm ${className}`}>
+          {children}
+        </div>
+      );
+    };
+
+    const CardHeader = ({ children, className = "" }) => {
+      return <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>{children}</div>;
+    };
+
+    const CardTitle = ({ children, className = "" }) => {
+      return <h3 className={`text-lg font-semibold leading-none tracking-tight ${className}`}>{children}</h3>;
+    };
+
+    const CardContent = ({ children, className = "" }) => {
+      return <div className={`p-6 pt-0 ${className}`}>{children}</div>;
+    };
+
+    const Badge = ({ children, className = "", variant = "default" }) => {
+      const variants = {
+        default: "bg-gray-900 text-white",
+        secondary: "bg-gray-100 text-gray-900",
+      };
+      return (
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${variants[variant]} ${className}`}>
+          {children}
+        </span>
+      );
+    };
+
+    const Table = ({ children, className = "" }) => {
+      return (
+        <div className="w-full overflow-auto">
+          <table className={`w-full caption-bottom text-sm ${className}`}>{children}</table>
+        </div>
+      );
+    };
+
+    const TableHeader = ({ children }) => <thead className="[&_tr]:border-b">{children}</thead>;
+    const TableBody = ({ children }) => <tbody className="[&_tr:last-child]:border-0">{children}</tbody>;
+    const TableRow = ({ children, className = "" }) => (
+      <tr className={`border-b transition-colors hover:bg-gray-50 ${className}`}>{children}</tr>
+    );
+    const TableHead = ({ children, className = "" }) => (
+      <th className={`h-12 px-4 text-left align-middle font-medium text-gray-500 ${className}`}>{children}</th>
+    );
+    const TableCell = ({ children, className = "" }) => (
+      <td className={`p-4 align-middle ${className}`}>{children}</td>
+    );
+
+    const Avatar = ({ children, className = "" }) => {
+      return (
+        <div className={`relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full ${className}`}>
+          {children}
+        </div>
+      );
+    };
+
+    const AvatarFallback = ({ children, className = "" }) => {
+      return (
+        <div className={`flex h-full w-full items-center justify-center rounded-full bg-gray-100 ${className}`}>
+          {children}
+        </div>
+      );
+    };
+
+    // Login Page
+    const Login = ({ onLogin }) => {
+      const [email, setEmail] = useState("");
+      const [password, setPassword] = useState("");
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        onLogin();
+      };
+
+      return (
+        <div className="min-h-screen bg-[#FF5722] flex items-center justify-center px-4">
+          <div className="w-full max-w-md">
+            <div className="flex items-center justify-center gap-2 mb-8 text-white">
+              <div className="text-2xl font-semibold">
+                sprobe <span className="font-light">| HRIS</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="example@mail.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center justify-between text-sm">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-gray-600">Remember Me</span>
+                  </label>
+                  <a href="#" className="text-[#FF5722] hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+
+                <Button type="submit" className="w-full bg-[#FF5722] hover:bg-[#E64A19] text-white">
+                  Log In
+                </Button>
+              </form>
+
+              <div className="mt-6 text-center text-sm text-gray-600">
+                © 2026 Sprobe Inc. All Rights Reserved.
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Dashboard Page
+    const Dashboard = () => {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-2">Welcome to Sprobe HRIS</p>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="users" size={16} className="text-[#FF5722]" />
+                  Total Employees
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-[#FF5722]">248</div>
+                <div className="text-xs text-gray-600 mt-1">+12% from last month</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="user-check" size={16} className="text-green-500" />
+                  On Probation
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-500">24</div>
+                <div className="text-xs text-gray-600 mt-1">Currently active</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="briefcase" size={16} className="text-blue-500" />
+                  Departments
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-500">12</div>
+                <div className="text-xs text-gray-600 mt-1">Active departments</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="calendar" size={16} className="text-purple-500" />
+                  Pending Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-500">8</div>
+                <div className="text-xs text-gray-600 mt-1">Awaiting approval</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Department Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { dept: "Engineering", count: 68, color: "bg-blue-500" },
+                    { dept: "Sales", count: 52, color: "bg-green-500" },
+                    { dept: "Marketing", count: 38, color: "bg-purple-500" },
+                    { dept: "HR", count: 24, color: "bg-orange-500" },
+                    { dept: "Finance", count: 32, color: "bg-red-500" },
+                  ].map((item) => (
+                    <div key={item.dept}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium">{item.dept}</span>
+                        <span className="text-sm text-gray-600">{item.count}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`${item.color} h-2 rounded-full`}
+                          style={{ width: `${(item.count / 68) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activities</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {[
+                    { name: "New employee onboarded", time: "2 hours ago", type: "success" },
+                    { name: "Leave request approved", time: "5 hours ago", type: "info" },
+                    { name: "Probation evaluation completed", time: "1 day ago", type: "warning" },
+                    { name: "Department meeting scheduled", time: "2 days ago", type: "info" },
+                    { name: "Performance review submitted", time: "3 days ago", type: "success" },
+                  ].map((activity, idx) => (
+                    <div key={idx} className="flex items-start gap-3 pb-3 border-b last:border-0">
+                      <div
+                        className={`w-2 h-2 rounded-full mt-2 ${
+                          activity.type === "success"
+                            ? "bg-green-500"
+                            : activity.type === "warning"
+                            ? "bg-yellow-500"
+                            : "bg-blue-500"
+                        }`}
+                      ></div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">{activity.name}</div>
+                        <div className="text-xs text-gray-500">{activity.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      );
+    };
+
+    // Employees Page
+    const Employees = () => {
+      const [employees, setEmployees] = useState(mockEmployees);
+      const [searchQuery, setSearchQuery] = useState("");
+      const [showDialog, setShowDialog] = useState(false);
+
+      const filteredEmployees = employees.filter(
+        (emp) =>
+          emp.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          emp.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          emp.department.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900">Employees</h1>
+              <p className="text-gray-600 mt-2">Manage your workforce</p>
+            </div>
+            <Button className="bg-[#FF5722] hover:bg-[#E64A19] text-white" onClick={() => setShowDialog(true)}>
+              <Icon name="plus" size={16} className="mr-2" />
+              Add Employee
+            </Button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="relative">
+              <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search employees..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Employee Table */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead>Employee ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Join Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredEmployees.map((emp) => (
+                  <TableRow key={emp.id}>
+                    <TableCell className="font-medium">{emp.id}</TableCell>
+                    <TableCell>{emp.fullName}</TableCell>
+                    <TableCell>{emp.email}</TableCell>
+                    <TableCell>{emp.department}</TableCell>
+                    <TableCell>{emp.position}</TableCell>
+                    <TableCell>{emp.joinDate}</TableCell>
+                    <TableCell>
+                      <Badge className="bg-green-500">{emp.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      );
+    };
+
+    // Probation Tracking Page
+    const ProbationTracking = () => {
+      const [searchQuery, setSearchQuery] = useState("");
+      const [statusFilter, setStatusFilter] = useState("all");
+
+      const probationStages = [
+        "Just Started",
+        "2nd Month",
+        "3rd Month Evaluation",
+        "4th Month",
+        "5th Month",
+        "End of Probation Evaluation",
+      ];
+
+      const getStatusColor = (status) => {
+        switch (status) {
+          case "Just Started": return "bg-blue-500";
+          case "2nd Month": return "bg-green-500";
+          case "3rd Month Evaluation": return "bg-yellow-500";
+          case "4th Month": return "bg-orange-500";
+          case "5th Month": return "bg-purple-500";
+          case "End of Probation Evaluation": return "bg-red-500";
+          default: return "bg-gray-500";
+        }
+      };
+
+      const filteredEmployees = probationEmployees.filter((emp) => {
+        const matchesSearch =
+          emp.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          emp.email.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      const getInitials = (name) => {
+        return name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase();
+      };
+
+      const employeesByStage = probationStages.map((stage) => ({
+        stage,
+        employees: filteredEmployees.filter((emp) => emp.status === stage),
+      }));
+
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Probation Tracking</h1>
+            <p className="text-gray-600 mt-2">Monitor and track employees during their probation period</p>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex-1 min-w-[200px]">
+                <div className="relative">
+                  <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Probation Pipeline */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {employeesByStage.map(({ stage, employees }) => (
+              <Card key={stage} className="flex flex-col">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="text-base">{stage}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {employees.length}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex-1">
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                    {employees.length === 0 ? (
+                      <p className="text-sm text-gray-500 text-center py-4">
+                        No employees in this stage
+                      </p>
+                    ) : (
+                      employees.map((emp, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-start gap-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarFallback className={`${getStatusColor(stage)} text-white text-xs`}>
+                                {getInitials(emp.fullName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm text-gray-900 truncate">
+                                {emp.fullName}
+                              </div>
+                              <div className="text-xs text-gray-500 truncate">
+                                {emp.email}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+    };
+
+    // Time Off Page
+    const TimeOff = () => {
+      const [searchQuery, setSearchQuery] = useState("");
+      const [timeOffRequests, setTimeOffRequests] = useState([
+        {
+          id: "TO-001",
+          employeeName: "Christopher Clark",
+          leaveType: "Vacation",
+          startDate: "2026-03-15",
+          endDate: "2026-03-20",
+          days: 6,
+          status: "Approved",
+        },
+        {
+          id: "TO-002",
+          employeeName: "Patricia Anderson",
+          leaveType: "Sick Leave",
+          startDate: "2026-03-10",
+          endDate: "2026-03-12",
+          days: 3,
+          status: "Approved",
+        },
+        {
+          id: "TO-003",
+          employeeName: "Robert Jackson",
+          leaveType: "Personal",
+          startDate: "2026-03-25",
+          endDate: "2026-03-26",
+          days: 2,
+          status: "Pending",
+        },
+      ]);
+
+      const filteredRequests = timeOffRequests.filter((request) =>
+        request.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      const totalDaysOff = timeOffRequests
+        .filter((r) => r.status === "Approved")
+        .reduce((sum, r) => sum + r.days, 0);
+
+      const pendingRequests = timeOffRequests.filter((r) => r.status === "Pending").length;
+      const approvedRequests = timeOffRequests.filter((r) => r.status === "Approved").length;
+
+      const getStatusBadge = (status) => {
+        switch (status) {
+          case "Approved":
+            return <Badge className="bg-green-500 hover:bg-green-600">Approved</Badge>;
+          case "Rejected":
+            return <Badge className="bg-red-500 hover:bg-red-600">Rejected</Badge>;
+          case "Pending":
+            return <Badge className="bg-yellow-500 hover:bg-yellow-600">Pending</Badge>;
+        }
+      };
+
+      const handleApprove = (id) => {
+        setTimeOffRequests(
+          timeOffRequests.map((req) =>
+            req.id === id ? { ...req, status: "Approved" } : req
+          )
+        );
+      };
+
+      const handleReject = (id) => {
+        setTimeOffRequests(
+          timeOffRequests.map((req) =>
+            req.id === id ? { ...req, status: "Rejected" } : req
+          )
+        );
+      };
+
+      return (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900">Time Off Management</h1>
+              <p className="text-gray-600 mt-2">Track and manage employee leave requests</p>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="calendar" size={16} className="text-[#FF5722]" />
+                  Total Days Off
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-[#FF5722]">{totalDaysOff}</div>
+                <div className="text-xs text-gray-600 mt-1">Approved this month</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="clock" size={16} className="text-yellow-500" />
+                  Pending Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-yellow-500">{pendingRequests}</div>
+                <div className="text-xs text-gray-600 mt-1">Awaiting approval</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-sm text-gray-700">
+                  <Icon name="check-circle" size={16} className="text-green-500" />
+                  Approved Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-500">{approvedRequests}</div>
+                <div className="text-xs text-gray-600 mt-1">This month</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Search Bar */}
+          <div className="bg-white rounded-lg shadow p-4">
+            <div className="relative">
+              <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search by employee name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {/* Time Off Requests Table */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead>ID</TableHead>
+                  <TableHead>Employee Name</TableHead>
+                  <TableHead>Leave Type</TableHead>
+                  <TableHead>Start Date</TableHead>
+                  <TableHead>End Date</TableHead>
+                  <TableHead>Days</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredRequests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium">{request.id}</TableCell>
+                    <TableCell>{request.employeeName}</TableCell>
+                    <TableCell>{request.leaveType}</TableCell>
+                    <TableCell>{request.startDate}</TableCell>
+                    <TableCell>{request.endDate}</TableCell>
+                    <TableCell>{request.days}</TableCell>
+                    <TableCell>{getStatusBadge(request.status)}</TableCell>
+                    <TableCell className="text-right">
+                      {request.status === "Pending" && (
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            onClick={() => handleApprove(request.id)}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleReject(request.id)}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      );
+    };
+
+    // Calendar Page
+    const CalendarPage = () => {
+      const [currentMonth, setCurrentMonth] = useState(5);
+      const [currentYear, setCurrentYear] = useState(2026);
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December",
+      ];
+
+      const events = [
+        { id: "1", title: "Team Meeting", date: "2026-06-02", type: "meeting" },
+        { id: "2", title: "HR Review", date: "2026-06-09", type: "evaluation" },
+        { id: "3", title: "Board Meeting", date: "2026-06-16", type: "meeting" },
+        { id: "4", title: "Q2 Review", date: "2026-06-23", type: "evaluation" },
+      ];
+
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+
+      const weeks = [];
+      let currentWeek = new Array(firstDayOfWeek).fill(null);
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        currentWeek.push(day);
+        if (currentWeek.length === 7) {
+          weeks.push(currentWeek);
+          currentWeek = [];
+        }
+      }
+      if (currentWeek.length > 0) {
+        while (currentWeek.length < 7) {
+          currentWeek.push(null);
+        }
+        weeks.push(currentWeek);
+      }
+
+      const getEventsForDay = (day) => {
+        const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        return events.filter((event) => event.date === dateStr);
+      };
+
+      const getEventTypeColor = (type) => {
+        switch (type) {
+          case "meeting": return "bg-red-500";
+          case "evaluation": return "bg-orange-500";
+          case "holiday": return "bg-green-500";
+          default: return "bg-gray-500";
+        }
+      };
+
+      const handlePreviousMonth = () => {
+        if (currentMonth === 0) {
+          setCurrentMonth(11);
+          setCurrentYear(currentYear - 1);
+        } else {
+          setCurrentMonth(currentMonth - 1);
+        }
+      };
+
+      const handleNextMonth = () => {
+        if (currentMonth === 11) {
+          setCurrentMonth(0);
+          setCurrentYear(currentYear + 1);
+        } else {
+          setCurrentMonth(currentMonth + 1);
+        }
+      };
+
+      const today = new Date();
+      const isToday = (day) =>
+        day === today.getDate() &&
+        currentMonth === today.getMonth() &&
+        currentYear === today.getFullYear();
+
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900">Calendar</h1>
+            <p className="text-gray-600 mt-2">Manage HR events and schedules</p>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>
+                  {monthNames[currentMonth]} {currentYear}
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={handlePreviousMonth}>
+                    <Icon name="chevron-left" size={16} />
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleNextMonth}>
+                    <Icon name="chevron-right" size={16} />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {/* Day Headers */}
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                    <div key={day} className="text-center text-sm font-medium text-gray-600">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="space-y-2">
+                  {weeks.map((week, weekIndex) => (
+                    <div key={weekIndex} className="grid grid-cols-7 gap-2">
+                      {week.map((day, dayIndex) => {
+                        const dayEvents = day ? getEventsForDay(day) : [];
+                        return (
+                          <div
+                            key={dayIndex}
+                            className={`min-h-[80px] p-2 rounded border transition-colors ${
+                              day === null
+                                ? "bg-gray-50"
+                                : isToday(day)
+                                ? "bg-blue-50 border-blue-500"
+                                : dayEvents.length > 0
+                                ? "bg-white border-gray-300 hover:border-[#FF5722] cursor-pointer"
+                                : "bg-white border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            {day && (
+                              <div>
+                                <div
+                                  className={`text-sm mb-1 ${
+                                    isToday(day) ? "font-bold text-blue-600" : "text-gray-700"
+                                  }`}
+                                >
+                                  {day}
+                                </div>
+                                <div className="space-y-1">
+                                  {dayEvents.slice(0, 2).map((event) => (
+                                    <div
+                                      key={event.id}
+                                      className={`text-xs px-1 py-0.5 rounded text-white truncate ${getEventTypeColor(event.type)}`}
+                                    >
+                                      {event.title}
+                                    </div>
+                                  ))}
+                                  {dayEvents.length > 2 && (
+                                    <div className="text-xs text-gray-500">
+                                      +{dayEvents.length - 2} more
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    };
+
+    // Layout Component
+    const Layout = ({ currentPage, setCurrentPage, onLogout }) => {
+      const navItems = [
+        { path: "dashboard", label: "Dashboard", icon: "layout-dashboard" },
+        { path: "employees", label: "Employees", icon: "users" },
+        { path: "probation", label: "Probation", icon: "user-check" },
+        { path: "time-off", label: "Time Off", icon: "plane-takeoff" },
+        { path: "calendar", label: "Calendar", icon: "calendar-days" },
+      ];
+
+      return (
+        <div className="min-h-screen bg-gray-50">
+          {/* Header */}
+          <header className="bg-[#FF5722] text-white shadow-md">
+            <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="text-xl font-semibold">
+                  sprobe <span className="font-light">| HRIS</span>
+                </div>
+              </div>
+
+              <nav className="flex items-center gap-1">
+                {navItems.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => setCurrentPage(item.path)}
+                    className={`px-4 py-2 rounded transition-colors flex items-center gap-2 ${
+                      currentPage === item.path ? "bg-white/20" : "hover:bg-white/10"
+                    }`}
+                  >
+                    <Icon name={item.icon} size={16} />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onLogout}
+                  className="text-white hover:bg-white/10 ml-2"
+                >
+                  <Icon name="log-out" size={16} className="mr-2" />
+                  Logout
+                </Button>
+              </nav>
+            </div>
+          </header>
+
+          {/* Main Content */}
+          <main className="max-w-7xl mx-auto px-4 py-8">
+            {currentPage === "dashboard" && <Dashboard />}
+            {currentPage === "employees" && <Employees />}
+            {currentPage === "probation" && <ProbationTracking />}
+            {currentPage === "time-off" && <TimeOff />}
+            {currentPage === "calendar" && <CalendarPage />}
+          </main>
+        </div>
+      );
+    };
+
+    // Main App Component
+    const App = () => {
+      const [isLoggedIn, setIsLoggedIn] = useState(false);
+      const [currentPage, setCurrentPage] = useState("dashboard");
+
+      useEffect(() => {
+        lucide.createIcons();
+      }, [currentPage, isLoggedIn]);
+
+      if (!isLoggedIn) {
+        return <Login onLogin={() => setIsLoggedIn(true)} />;
+      }
+
+      return (
+        <Layout
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          onLogout={() => setIsLoggedIn(false)}
+        />
+      );
+    };
+
+    // Render App
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
