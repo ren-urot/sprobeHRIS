@@ -55,7 +55,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-])
+], { basename: '/sprobeHRIS' })
 
 export default function App() {
   return <RouterProvider router={router} />
