@@ -107,10 +107,10 @@ export default function EmploymentTab() {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <div className="flex flex-col gap-1.5 w-1/2">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-1.5 w-full sm:w-1/2">
             <label className="text-[13px] font-medium">Email</label>
-            <Input type="email" value={info.workEmail} onChange={set('workEmail')} placeholder="Enter primary address" />
+            <Input type="email" value={info.workEmail} onChange={set('workEmail')} placeholder="Enter work email" />
           </div>
         </div>
       </FormPanel>

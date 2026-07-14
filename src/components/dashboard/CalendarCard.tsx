@@ -28,47 +28,49 @@ function getDots(day: number, isOther: boolean) {
 
 export default function CalendarCard() {
   return (
-    <div className="bg-white rounded-card shadow-card p-6 xl:h-full flex flex-col">
-      <h3 className="text-brand-orange text-xl font-bold mb-4">June 2022</h3>
+    <div className="bg-white rounded-card shadow-card p-6 xl:h-full flex flex-col overflow-hidden">
+      <h3 className="text-brand-orange text-xl font-bold mb-4 flex-shrink-0">June 2022</h3>
 
-      <table className="w-full xl:flex-1">
-        <thead>
-          <tr>
-            {DAYS.map(d => (
-              <th key={d} className="text-center text-[12px] font-semibold text-[#888] pb-2">{d}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {weeks.map((week, wi) => (
-            <tr key={wi}>
-              {week.map((cell, ci) => {
-                const matched = getDots(cell.d, !!cell.other)
-                const isToday = cell.d === 5 && !cell.other
-                return (
-                  <td key={ci} className="text-center py-1.5 px-0.5">
-                    <span className={`text-[13px] ${cell.other ? 'text-[#CCC]' : ''} ${isToday ? 'text-brand-orange font-bold' : ''}`}>
-                      {cell.d}
-                    </span>
-                    {matched.length > 0 && (
-                      <div className="flex justify-center gap-0.5 mt-0.5">
-                        {matched[0].types.map((type, ti) => (
-                          <span
-                            key={ti}
-                            className={`inline-block w-1.5 h-1.5 rounded-full ${type === 'today' ? 'bg-brand-blue' : 'bg-brand-red'}`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                )
-              })}
+      <div className="xl:flex-1 xl:min-h-0 xl:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <table className="w-full">
+          <thead>
+            <tr>
+              {DAYS.map(d => (
+                <th key={d} className="text-center text-[12px] font-semibold text-[#888] pb-2">{d}</th>
+              ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {weeks.map((week, wi) => (
+              <tr key={wi}>
+                {week.map((cell, ci) => {
+                  const matched = getDots(cell.d, !!cell.other)
+                  const isToday = cell.d === 5 && !cell.other
+                  return (
+                    <td key={ci} className="text-center py-1.5 px-0.5">
+                      <span className={`text-[13px] ${cell.other ? 'text-[#CCC]' : ''} ${isToday ? 'text-brand-orange font-bold' : ''}`}>
+                        {cell.d}
+                      </span>
+                      {matched.length > 0 && (
+                        <div className="flex justify-center gap-0.5 mt-0.5">
+                          {matched[0].types.map((type, ti) => (
+                            <span
+                              key={ti}
+                              className={`inline-block w-1.5 h-1.5 rounded-full ${type === 'today' ? 'bg-brand-blue' : 'bg-brand-red'}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="flex items-center justify-between mt-3.5">
+      <div className="flex items-center justify-between mt-[24px] flex-shrink-0">
         <div className="flex gap-4">
           <div className="flex items-center gap-1.5 text-[12px] text-[#888]">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-blue inline-block" />

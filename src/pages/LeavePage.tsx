@@ -131,12 +131,12 @@ export default function LeavePage() {
 
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Input
             placeholder="Search employee…"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            className="w-[240px]"
+            className="w-full sm:w-[240px]"
           />
           <Select value={statusFilter} onValueChange={v => { setStatusFilter(v); setPage(1) }}>
             <SelectTrigger className="w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
@@ -190,7 +190,7 @@ export default function LeavePage() {
                 </TableCell>
                 <TableCell className="py-[12px]">
                   {r.status === 'Pending' ? (
-                    <div className="flex gap-1.5">
+                    <div className="flex gap-1.5 -ml-3">
                       <button
                         onClick={() => handleApprove(r.id)}
                         className="w-[30px] h-[30px] rounded-full bg-green-500 flex items-center justify-center hover:opacity-90 transition-opacity"

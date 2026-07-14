@@ -41,7 +41,7 @@ export default function PayrollPage() {
     <div className="p-4 md:p-7 flex flex-col xl:flex-1 xl:min-h-0 xl:overflow-y-auto gap-5">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <h1 className="text-[30px] font-bold text-brand-orange">Payroll</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
             <SelectContent>

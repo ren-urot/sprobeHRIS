@@ -71,11 +71,11 @@ export default function ProbationaryTable() {
         </div>
       </div>
 
-      {/* Table with horizontal scroll on mobile */}
-      <div className="overflow-x-auto flex-1">
+      {/* Table: horizontal scroll on mobile, vertical scroll whenever it doesn't fit the viewport */}
+      <div className="overflow-auto flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <Table>
           <TableHeader>
-            <tr className="bg-brand-th">
+            <tr className="bg-brand-th sticky top-0 z-10">
               <TableHead className="whitespace-nowrap">Full Name</TableHead>
               <TableHead className="whitespace-nowrap hidden sm:table-cell">Email</TableHead>
               <TableHead className="whitespace-nowrap">Status</TableHead>

@@ -20,7 +20,7 @@ export default function AcademicTab() {
   return (
     <div className="flex flex-col gap-5">
       <FormPanel title="Academic">
-        <div className="flex gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-[13px] font-medium">School / University</label>
             <Input value={info.school} onChange={set('school')} placeholder="Enter school name" />
@@ -30,7 +30,7 @@ export default function AcademicTab() {
             <Input value={info.degree} onChange={set('degree')} placeholder="Enter degree or course" />
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex flex-col gap-1.5 flex-[0.4]">
             <label className="text-[13px] font-medium">Year Started</label>
             <Input value={info.yearStarted} onChange={set('yearStarted')} placeholder="YYYY" maxLength={4} />

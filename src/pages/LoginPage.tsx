@@ -52,7 +52,7 @@ export default function LoginPage() {
                   onClick={() => setShowPw(s => !s)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#AAAAAA] hover:text-[#888]"
                 >
-                  {showPw ? <Eye size={20} /> : <EyeOff size={20} />}
+                  {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>

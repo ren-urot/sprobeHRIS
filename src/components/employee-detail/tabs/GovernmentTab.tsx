@@ -19,7 +19,7 @@ export default function GovernmentTab() {
   return (
     <div className="flex flex-col gap-5">
       <FormPanel title="Government">
-        <div className="flex gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-[13px] font-medium">SSS</label>
             <Input value={ids.sss} onChange={set('sss')} placeholder="Enter SSS number" />
@@ -29,7 +29,7 @@ export default function GovernmentTab() {
             <Input value={ids.hdmf} onChange={set('hdmf')} placeholder="Enter HDMF number" />
           </div>
         </div>
-        <div className="flex gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-[13px] font-medium">Philhealth</label>
             <Input value={ids.philhealth} onChange={set('philhealth')} placeholder="Enter philhealth" />
@@ -39,7 +39,7 @@ export default function GovernmentTab() {
             <Input value={ids.bir} onChange={set('bir')} placeholder="Enter BIR" />
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex flex-col gap-1.5 flex-[0.5]">
             <label className="text-[13px] font-medium">NBI</label>
             <Input value={ids.nbi} onChange={set('nbi')} placeholder="Enter NBI" />
